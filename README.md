@@ -1,5 +1,5 @@
 <h1 align="center">
-📇AnkiGPTGPT
+📇AnkiGPT
 </h1>
 
 Generate Q/A flashcards in csv file format ready for import in Anki app.
