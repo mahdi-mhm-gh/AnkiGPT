@@ -97,10 +97,8 @@ if button or st.session_state.get("submit"):
             answer1 = answer.replace("Q:", "\nQ:")
             answer2 = answer1.replace("\nQ:", "Q:", 1)
             data = []
-            print(answer2)
             rows = answer2.split('\n')
             rows = list(filter(lambda el: el != '', rows))
-            print(rows)
             for row in rows:
                 columns = row.split(';')
                 data.append([columns[0], columns[1]])
