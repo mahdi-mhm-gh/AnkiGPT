@@ -89,15 +89,18 @@ if button or st.session_state.get("submit"):
         try:
             if show_source:
                 st.write(sources)
-            answer = get_answer(sources,chat_prompt)
+            answer = get_answer(sources,chat_prompt).replace("A:", ";A:")
+            answer = answer.replace("\n;A:", ";A:")
             if show_flashcards:
                 with st.container():
                     st.write(answer)
             answer1 = answer.replace("Q:", "\nQ:")
             answer2 = answer1.replace("\nQ:", "Q:", 1)
             data = []
-            rows = answer.split('\n')
-            rows = [s for s in rows if s]
+            print(answer2)
+            rows = answer2.split('\n')
+            rows = list(filter(lambda el: el != '', rows))
+            print(rows)
             for row in rows:
                 columns = row.split(';')
                 data.append([columns[0], columns[1]])
