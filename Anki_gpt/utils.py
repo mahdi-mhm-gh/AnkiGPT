@@ -52,7 +52,7 @@ def parse_txt(file: BytesIO) -> str:
 
  
 @st.cache_data
-def text_to_docs(text: str | List[str]) -> List[Document]:
+def text_to_docs(text: str or List[str]) -> List[Document]:
     """Converts a string or list of strings to a list of Documents
     with metadata."""
     if isinstance(text, str):
