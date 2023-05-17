@@ -65,7 +65,7 @@ if uploaded_file is not None:
 # st.write(doc)
 # st.write(text)
 # st.write(index)
-query = st.text_area("Write the subject you want flashcards for", on_change=clear_submit)
+query = st.text_input("Write the subject you want flashcards for", on_change=clear_submit)
 # st.write(query)
 with st.expander("Advanced Options"):
     show_flashcards = st.checkbox("Show the question, answer flashcards")
@@ -111,13 +111,13 @@ if button or st.session_state.get("submit"):
             data = [row for row in data if len(row) == num_columns]
 
             # Save the data as a CSV file
+            if not os.path.exists('.tmp'):
+                os.mkdir('.tmp')
+
             with open(f'.tmp/{query}.csv', 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([ 'Question', 'Answer'])
                 writer.writerows(data)
-
-            if not os.path.exists('.tmp'):
-                os.mkdir('.tmp')
 
             # Create a download link for your CSV file
             data = pd.read_csv(f".tmp/{query}.csv")

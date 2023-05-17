@@ -8,11 +8,7 @@ def faq():
 ## How does AnkiGPT work?
 Upload a file (txt, docx or pdf) and write the subject you want flashcards for. 
 AnkiGPT will generate a csv file of Q/A flashcards based on your document and subject.
-"The CSV file containing information related to your subject can be located 
-in the AnkiGPT directory under the name of the subject."
-
-## What should I do if I face with this error:"IndexError: list index out of range"?
-Please press the submit button again. This is the first version of AnkiGPT and I will try to fix this bug😊
+You can donwload the csv file with a link below the page after clicking on submit button. This may take a while, so be patient!
 
 ## Is my data safe?
 Yes, your data is safe. AnkiGPT does not store your documents or
