@@ -1,4 +1,7 @@
 import streamlit as st
+import os
+import shutil
+import atexit
 from openai.error import OpenAIError
 
 from components.sidebar import sidebar
@@ -108,18 +111,26 @@ if button or st.session_state.get("submit"):
             data = [row for row in data if len(row) == num_columns]
 
             # Save the data as a CSV file
-            with open(f'{query}.csv', 'w', newline='') as file:
+            with open(f'.tmp/{query}.csv', 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([ 'Question', 'Answer'])
                 writer.writerows(data)
-            data = pd.read_csv(f"{query}.csv")
+
+            if not os.path.exists('.tmp'):
+                os.mkdir('.tmp')
 
             # Create a download link for your CSV file
+            data = pd.read_csv(f".tmp/{query}.csv")
             csvfile = data.to_csv(header=False,index=False)
-            # encoded_csvfile = csvfile.encode('utf_8')
-            # b64 = base64.b64encode(encoded_csvfile).decode()
-            # href = f'<a href="data:file/csv;base64,{b64}" download="output.csv">Download CSV file</a>'
-            # st.markdown(href, unsafe_allow_html=True)
+            encoded_csvfile = csvfile.encode('utf_8', errors='ignore')
+            b64 = base64.b64encode(encoded_csvfile).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="{query}.csv">Download CSV file</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
         except OpenAIError as e:
             st.error(e._message)
+
+def exit_handler():
+    shutil.rmtree('.tmp')
+
+atexit.register(exit_handler)
