@@ -1,4 +1,7 @@
 import streamlit as st
+import os
+import shutil
+import atexit
 from openai.error import OpenAIError
 
 from components.sidebar import sidebar
@@ -62,7 +65,7 @@ if uploaded_file is not None:
 # st.write(doc)
 # st.write(text)
 # st.write(index)
-query = st.text_area("Write the subject you want flashcards for", on_change=clear_submit)
+query = st.text_input("Write the subject you want flashcards for", on_change=clear_submit)
 # st.write(query)
 with st.expander("Advanced Options"):
     show_flashcards = st.checkbox("Show the question, answer flashcards")
@@ -89,15 +92,16 @@ if button or st.session_state.get("submit"):
         try:
             if show_source:
                 st.write(sources)
-            answer = get_answer(sources,chat_prompt)
+            answer = get_answer(sources,chat_prompt).replace("A:", ";A:")
+            answer = answer.replace("\n;A:", ";A:")
             if show_flashcards:
                 with st.container():
                     st.write(answer)
             answer1 = answer.replace("Q:", "\nQ:")
             answer2 = answer1.replace("\nQ:", "Q:", 1)
             data = []
-            rows = answer.split('\n')
-            rows = [s for s in rows if s]
+            rows = answer2.split('\n')
+            rows = list(filter(lambda el: el != '', rows))
             for row in rows:
                 columns = row.split(';')
                 data.append([columns[0], columns[1]])
@@ -107,18 +111,26 @@ if button or st.session_state.get("submit"):
             data = [row for row in data if len(row) == num_columns]
 
             # Save the data as a CSV file
-            with open(f'{query}.csv', 'w', newline='') as file:
+            if not os.path.exists('.tmp'):
+                os.mkdir('.tmp')
+
+            with open(f'.tmp/{query}.csv', 'w', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow([ 'Question', 'Answer'])
                 writer.writerows(data)
-            data = pd.read_csv(f"{query}.csv")
 
             # Create a download link for your CSV file
+            data = pd.read_csv(f".tmp/{query}.csv")
             csvfile = data.to_csv(header=False,index=False)
-            # encoded_csvfile = csvfile.encode('utf_8')
-            # b64 = base64.b64encode(encoded_csvfile).decode()
-            # href = f'<a href="data:file/csv;base64,{b64}" download="output.csv">Download CSV file</a>'
-            # st.markdown(href, unsafe_allow_html=True)
+            encoded_csvfile = csvfile.encode('utf_8', errors='ignore')
+            b64 = base64.b64encode(encoded_csvfile).decode()
+            href = f'<a href="data:file/csv;base64,{b64}" download="{query}.csv">Download CSV file</a>'
+            st.markdown(href, unsafe_allow_html=True)
 
         except OpenAIError as e:
             st.error(e._message)
+
+def exit_handler():
+    shutil.rmtree('.tmp')
+
+atexit.register(exit_handler)
